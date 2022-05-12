@@ -74,18 +74,39 @@ void StateMachine() {
     double tuna_price=1;
     double coffee_price=0.5;
     double credit = 0;
+    int money = 0;
+
     while (1) {
       switch (state) {
-        START:
-            if(B5FLAG!=0 || B6Flag!=0 || B6Flag!=0 || B6Flag!=0){
-                  if(B5FLAG!=0)
-                        credit = credit+0.1;
-                  if(B6FLAG!=0)
-                        credit = credit+0.2;
-                  if(B7FLAG!=0)
-                        credit = credit+0.5;
-                  if(B8FLAG!=0)
-                        credit = credit+1;
+        case START:
+          printk("To insert coins press:\n    1 - 10Cents\n   2 - 20Cents\n   3 - 50Cents\n   4 - 1Euro\nTo choose a product, press Up and Down.\nTo get your money back press Return.\n\r");
+          while(money>=1 && money<=4)
+          {
+            scanf("%d", &money);
+            if(money==1)
+                      B5Flag = 1;
+            if(money==2)
+                      B6Flag = 1;
+            if(money==3)
+                      B7Flag = 1;
+            if(money==4)
+                      B8Flag = 1;
+            money = 0;
+
+            if(B5Flag!=0){
+                  credit = credit+0.1;
+                  state = START;
+            }
+            if(B6Flag!=0){
+                  credit = credit+0.2;
+                  state = START;
+            }
+            if(B7Flag!=0){
+                  credit = credit+0.5;
+                  state = START;
+            }
+            if(B8Flag!=0){
+                  credit = credit+1;
                   state = START;
             }
             if(B1Flag!=0){
@@ -97,9 +118,10 @@ void StateMachine() {
             if(B4Flag!=0){
                   state = START;
             }
+        }
         break;
 
-        BEER:
+        case BEER:
             printk("   Coffee: %f\n-> Beer: %f\n   Tuna Salad: %f   Credit is %f\n\r", coffee_price, beer_price, tuna_price, credit);
             if(B2Flag!=0){
                   if(credit < beer_price){
@@ -119,14 +141,14 @@ void StateMachine() {
                   /*printk("-> Beer: %f, credit is %f\n   Tuna Salad: %f\n\r", beer_price, credit, tuna_price);*/
                   state = TUNA;
              }
-             if(B4FLAG!=0){
+             if(B4Flag!=0){
                   printk("%f EUR returned!\n\r", credit);
                   credit = 0;
                   state = START;
              }
         break;
 
-        TUNA: 
+        case TUNA: 
             printk("   Beer: %f\n-> Tuna Salad: %f\n   Coffee: %f   Credit is %f\n\r", beer_price, tuna_price, coffee_price, credit);     
             if(B2Flag!=0){
                   if(credit < tuna_price){
@@ -146,14 +168,14 @@ void StateMachine() {
                   /*printk("-> Tuna Salad: %f, credit is %f\n   Coffee: %f\n\r", tuna_price, credit, coffee_price);*/
                   state = COFFEE;
              }
-             if(B4FLAG!=0){
+             if(B4Flag!=0){
                   printk("%f EUR returned!\n\r", credit);
                   credit = 0;
                   state = START;
              }   
         break;
                              
-        COFFEE:      
+        case COFFEE:      
             printk("   Tuna Salad: %f\n-> Coffee: %f\n   Beer: %f   Credit is %f\n\r", tuna_price, coffee_price, beer_price, credit); 
             if(B2Flag!=0){
                   if(credit < coffee_price){
@@ -173,7 +195,7 @@ void StateMachine() {
                   /*printk("-> Coffee: %f, credit is %f\n   Beer: %f\n\r", coffee_price, credit, beer_price);*/
                   state = BEER;
              }
-             if(B4FLAG!=0){
+             if(B4Flag!=0){
                   printk("%f EUR returned!\n\r", credit);
                   credit = 0;
                   state = START;
@@ -219,7 +241,6 @@ void but4press_cbfunction(const struct device *dev, struct gpio_callback *cb, ui
     /* Update Flag*/
     B4Flag = 1;
 }
-
 
 
 /* Main function */
